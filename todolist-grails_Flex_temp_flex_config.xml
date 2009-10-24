@@ -1,0 +1,32 @@
+<flex-config xmlns="http://www.adobe.com/2006/flex-config">
+  <target-player>10</target-player>
+  <compiler>
+    <debug>true</debug>
+    <source-path>
+      <path-element>src/java</path-element>
+      <path-element>src/groovy</path-element>
+      <path-element>grails-app/controllers</path-element>
+      <path-element>grails-app/domain</path-element>
+      <path-element>grails-app/services</path-element>
+      <path-element>grails-app/taglib</path-element>
+      <path-element>test/unit</path-element>
+      <path-element>test/integration</path-element>
+      <path-element>src/flex</path-element>
+    </source-path>
+    <library-path append="true">
+      <path-element>lib/flex/datavisualization-3.3.0.4852.rb.swc</path-element>
+      <path-element>lib/flex/astra-flex-1.4.swc</path-element>
+      <path-element>lib/flex/datavisualization-3.3.0.4852-en_US.rb.swc</path-element>
+      <path-element>lib/flex/flexlib-bin-2.4.swc</path-element>
+      <path-element>lib/flex/datavisualization-3.3.0.4852.swc</path-element>
+      <path-element>lib/flex/granite-core-swc-1.2.0.swc</path-element>
+      <path-element>lib/flex/calert-1.0.swc</path-element>
+    </library-path>
+    <services>web-app/WEB-INF/flex/services-config.xml</services>
+    <context-root>todolist-grails</context-root>
+  </compiler>
+  <file-specs>
+    <path-element>src/flex/index.mxml</path-element>
+  </file-specs>
+  <output>/Users/sarbogast/dev/todolist-grails/web-app/index.swf</output>
+</flex-config>

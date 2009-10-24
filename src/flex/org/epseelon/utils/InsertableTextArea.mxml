@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<mx:TextArea xmlns:mx="http://www.adobe.com/2006/mxml">
+    <mx:Script>
+        <![CDATA[
+        public function insertAtCaret(str:String):void {
+            this.textField.replaceText(this.selectionBeginIndex, this.selectionEndIndex, str);
+        }
+        ]]>
+    </mx:Script>
+</mx:TextArea>

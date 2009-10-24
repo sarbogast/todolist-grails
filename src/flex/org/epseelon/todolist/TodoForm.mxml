@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+<utils:ResizeableTitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:utils="org.epseelon.utils.*"
+                             title="Todo" creationComplete="titleField.setFocus()">
+    <mx:Script>
+        <![CDATA[
+        import org.epseelon.todolist.dto.TodoDetail;
+        import org.epseelon.todolist.enums.Priority;
+
+        [Bindable]
+        private var _todo:TodoDetail = new TodoDetail();
+        public function set todo(todo:TodoDetail):void {
+            _todo = todo;
+        }
+
+        private var _saveTodo:Function;
+        public function set saveTodo(value:Function):void {
+            _saveTodo = value;
+        }
+
+        private var _cancelTodo:Function;
+        public function set cancelTodo(value:Function):void {
+            _cancelTodo = value;
+        }
+
+        private function getPriorityLabel(item:Object):String {
+            return (item as Priority).name;
+        }
+
+        private function cancel():void {
+            _cancelTodo();
+        }
+
+        private function save():void {
+            if (validate()) {
+                _saveTodo(_todo);
+            }
+        }
+
+        private function validate():Boolean {
+            return Validator.validateAll(validators).length == 0;
+        }
+        ]]>
+    </mx:Script>
+
+    <mx:Array id="validators">
+        <mx:StringValidator source="{titleField}" property="text" required="true" minLength="1"/>
+        <mx:Validator source="{priorityField}" property="selectedItem" required="true"/>
+    </mx:Array>
+
+    <mx:Form width="100%" height="100%">
+        <mx:FormItem label="Title" width="100%" required="true">
+            <mx:TextInput id="titleField" width="100%" text="{_todo.title}" focusOut="_todo.title = titleField.text"/>
+        </mx:FormItem>
+        <mx:FormItem label="Priority" width="100%" required="true">
+            <mx:ComboBox id="priorityField" width="100%"
+                         selectedItem="{priorityField.dataProvider == null ? null : (_todo.priority == null ? null : Priority.valueOf(_todo.priority))}"
+                         dataProvider="{Priority.constants}" labelFunction="getPriorityLabel"
+                         change="_todo.priority = priorityField.selectedItem.name"/>
+        </mx:FormItem>
+        <mx:FormItem label="Description" width="100%" height="100%">
+            <mx:TextArea id="descriptionField" width="100%" height="100%" text="{_todo.description}"
+                         focusOut="_todo.description = descriptionField.text"/>
+        </mx:FormItem>
+    </mx:Form>
+    <mx:ControlBar horizontalAlign="right">
+        <mx:Button label="Cancel" click="cancel()"/>
+        <mx:Button label="Save" click="save()"/>
+    </mx:ControlBar>
+</utils:ResizeableTitleWindow>

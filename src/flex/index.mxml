@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+                xmlns:todolist="org.epseelon.todolist.*"
+                layout="absolute"
+                width="100%"
+                height="100%" >
+    <mx:Script>
+        <![CDATA[
+
+        ]]>
+    </mx:Script>
+    <mx:Style source="/css/main.css"/>
+    <mx:HBox width="100%" height="100%">
+        <mx:VBox width="100%" height="100%">
+            <todolist:TodoListView width="50%" height="50%"/>
+        </mx:VBox>
+    </mx:HBox>
+</mx:Application>

@@ -1,0 +1,144 @@
+<?xml version="1.0" ?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" title="Todo Lists" creationComplete="initLists()">
+    <mx:Script>
+        <![CDATA[
+        import flexed.widgets.alerts.alert;
+
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.events.CloseEvent;
+        import mx.managers.PopUpManager;
+        import mx.rpc.events.FaultEvent;
+        import mx.rpc.events.ResultEvent;
+
+        import org.epseelon.todolist.dto.TodoListDetail;
+        import org.epseelon.todolist.dto.TodoListItem;
+
+        [Bindable]
+        private var _todoLists:ArrayCollection;
+
+        private var _todoListForm:TodoListForm;
+
+        private function initLists():void {
+            reloadTodoLists();
+        }
+
+        private function reloadTodoLists():void {
+            todoListService.getAllLists();
+        }
+
+        private function todoListsLoaded(e:ResultEvent):void {
+            _todoLists = e.result as ArrayCollection;
+        }
+
+        private function todoListsNotLoaded(e:FaultEvent):void {
+            alert.error("Impossible to load Todo Lists");
+        }
+
+        private function createNewTodoList():void {
+            _todoListForm = new TodoListForm();
+            _todoListForm.saveTodoList = createTodoList;
+            _todoListForm.cancelTodoList = cancelTodoList;
+            PopUpManager.addPopUp(_todoListForm, this, true);
+            PopUpManager.centerPopUp(_todoListForm);
+        }
+
+        private function cancelTodoList():void {
+            closeTodoListForm();
+        }
+
+        private function closeTodoListForm():void {
+            PopUpManager.removePopUp(_todoListForm);
+            _todoListForm = null;
+        }
+
+        private function createTodoList(todoList:TodoListDetail):void {
+            todoListService.createList(todoList);
+        }
+
+        private function todoListNotCreated(e:FaultEvent):void {
+            alert.error("Could not create Todo List");
+        }
+
+        private function todoListCreated(e:ResultEvent):void {
+            closeTodoListForm();
+            reloadTodoLists();
+        }
+
+        private function updateTodoList(todoList:TodoListDetail):void {
+            todoListService.updateList(todoList);
+        }
+
+        private function todoListUpdated(e:ResultEvent):void {
+            closeTodoListForm();
+            reloadTodoLists();
+        }
+
+        private function todoListNotUpdated(e:FaultEvent):void {
+            alert.error("Impossible to update todo list because " + e.fault.rootCause.message);
+        }
+
+        private function editSelectedTodoList():void {
+            var todoList:TodoListItem = todoListsList.selectedItem as TodoListItem;
+            if (todoList != null) {
+                todoListService.getList(todoList.id);
+            }
+        }
+
+        private function todoListLoaded(e:ResultEvent):void {
+            _todoListForm = new TodoListForm();
+            _todoListForm.todoList = new TodoListDetail(e.result as TodoListDetail);
+            _todoListForm.saveTodoList = updateTodoList;
+            _todoListForm.cancelTodoList = cancelTodoList;
+            PopUpManager.addPopUp(_todoListForm, this, true);
+            PopUpManager.centerPopUp(_todoListForm);
+        }
+
+        private function todoListNotLoaded(e:FaultEvent):void {
+            alert.error("Could not load todo list because " + e.fault.rootCause.message);
+        }
+
+        private function deleteSelectedTodoList():void {
+            var todoList:TodoListItem = todoListsList.selectedItem as TodoListItem;
+            if (todoList != null) {
+                alert.confirm("Are you sure you want to delete this list?", confirmTodoListDeletion);
+            }
+        }
+
+        private function confirmTodoListDeletion(event:CloseEvent):void {
+            if (event.detail == Alert.YES) {
+                var todoList:TodoListItem = todoListsList.selectedItem as TodoListItem;
+                todoListService.deleteList(todoList.id);
+            }
+        }
+
+        private function todoListDeleted(e:ResultEvent):void {
+            reloadTodoLists();
+        }
+
+        private function todoListNotDeleted(e:FaultEvent):void {
+            alert.error("Could not delete this todo list because " + e.fault.rootCause.message);
+        }
+
+        ]]>
+    </mx:Script>
+
+    <mx:RemoteObject id="todoListService" destination="todoListService" showBusyCursor="true">
+        <mx:method name="getAllLists" fault="todoListsNotLoaded(event)" result="todoListsLoaded(event)"/>
+        <mx:method name="createList" fault="todoListNotCreated(event)" result="todoListCreated(event)"/>
+        <mx:method name="getList" fault="todoListNotLoaded(event)" result="todoListLoaded(event)"/>
+        <mx:method name="updateList" fault="todoListNotUpdated(event)" result="todoListUpdated(event)"/>
+        <mx:method name="deleteList" fault="todoListNotDeleted(event)" result="todoListDeleted(event)"/>
+    </mx:RemoteObject>
+
+    <mx:List id="todoListsList" dataProvider="{_todoLists}" labelField="name" width="100%" height="100%"
+             doubleClickEnabled="true" doubleClick="editSelectedTodoList()"/>
+    <mx:ControlBar>
+        <mx:Button label="Reload" icon="@Embed('/icons/arrow_refresh.png')" click="reloadTodoLists()"/>
+        <mx:Spacer width="100%"/>
+        <mx:Button label="Create a List" icon="@Embed('/icons/script_add.png')" click="createNewTodoList()"/>
+        <mx:Button label="Delete Selected List" icon="@Embed('/icons/script_delete.png')"
+                   click="deleteSelectedTodoList()"
+                   enabled="{todoListsList.selectedIndices.length > 0}"/>
+    </mx:ControlBar>
+</mx:Panel>

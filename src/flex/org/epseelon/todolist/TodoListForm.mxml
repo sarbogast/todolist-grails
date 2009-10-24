@@ -1,0 +1,127 @@
+<?xml version="1.0" ?>
+<utils:ResizeableTitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:utils="org.epseelon.utils.*"
+                             title="Todo List" creationComplete="nameField.setFocus()">
+    <mx:Script>
+        <![CDATA[
+        import mx.managers.PopUpManager;
+
+        import mx.validators.Validator;
+
+        import org.epseelon.todolist.dto.TodoDetail;
+        import org.epseelon.todolist.dto.TodoListDetail;
+
+        [Bindable]
+        private var _todoList:TodoListDetail = new TodoListDetail();
+
+        public function set todoList(todoList:TodoListDetail):void {
+            _todoList = todoList;
+        }
+
+        private var _saveTodoList:Function;
+
+        public function set saveTodoList(value:Function):void {
+            _saveTodoList = value;
+        }
+
+        private var _cancelTodoList:Function;
+
+        public function set cancelTodoList(value:Function):void {
+            _cancelTodoList = value;
+        }
+
+        private var _todoForm:TodoForm;
+
+        private function createNewTodo():void {
+            _todoForm = new TodoForm();
+            _todoForm.cancelTodo = cancelTodo;
+            _todoForm.saveTodo = createTodo;
+            PopUpManager.addPopUp(_todoForm, this, true);
+            PopUpManager.centerPopUp(_todoForm);
+        }
+
+        private function cancelTodo():void {
+            closeTodoForm();
+        }
+
+        private function closeTodoForm():void {
+            PopUpManager.removePopUp(_todoForm);
+            _todoForm = null;
+        }
+
+        private function createTodo(todo:TodoDetail):void {
+            _todoList.todos.addItem(todo);
+            closeTodoForm();
+        }
+
+        private function deleteSelectedTodo():void {
+            var todo:TodoDetail = todosGrid.selectedItem as TodoDetail;
+            if (todo != null) {
+                _todoList.todos.removeItemAt(_todoList.todos.getItemIndex(todo));
+            }
+        }
+
+        private function editSelectedTodo():void {
+            var todo:TodoDetail = todosGrid.selectedItem as TodoDetail;
+            if (todo != null) {
+                _todoForm = new TodoForm();
+                _todoForm.todo = new TodoDetail(todo);
+                _todoForm.cancelTodo = cancelTodo;
+                _todoForm.saveTodo = updateTodo;
+                PopUpManager.addPopUp(_todoForm, this, true);
+                PopUpManager.centerPopUp(_todoForm);
+            }
+        }
+
+        private function updateTodo(todo:TodoDetail):void {
+            _todoList.todos.setItemAt(todo, todosGrid.selectedIndex);
+            closeTodoForm();
+        }
+
+        private function save():void {
+            if (validate()) {
+                _saveTodoList(_todoList);
+            }
+        }
+
+        private function validate():Boolean {
+            return Validator.validateAll(validators).length == 0;
+        }
+
+        private function cancel():void {
+            _cancelTodoList();
+        }
+
+        ]]>
+    </mx:Script>
+
+    <mx:Array id="validators">
+        <mx:StringValidator source="{nameField}" property="text" required="true" minLength="1"/>
+    </mx:Array>
+
+    <mx:Form width="100%" height="100%">
+        <mx:FormItem label="Name" width="100%" required="true">
+            <mx:TextInput id="nameField" width="100%" text="{_todoList.name}"
+                          focusOut="_todoList.name = nameField.text"/>
+        </mx:FormItem>
+        <mx:FormItem label="Todo's" width="100%" height="100%">
+            <mx:HBox width="100%" height="100%">
+                <mx:DataGrid width="100%" height="100%" id="todosGrid" dataProvider="{_todoList.todos}"
+                             doubleClickEnabled="true" doubleClick="editSelectedTodo()">
+                    <mx:columns>
+                        <mx:DataGridColumn headerText="Title" dataField="title"/>
+                        <mx:DataGridColumn headerText="Priority" dataField="priority"/>
+                    </mx:columns>
+                </mx:DataGrid>
+                <mx:VBox height="100%">
+                    <mx:Button icon="@Embed('/icons/note_add.png')" click="createNewTodo()"/>
+                    <mx:Button icon="@Embed('/icons/note_delete.png')" click="deleteSelectedTodo()"
+                               enabled="{todosGrid.selectedIndices.length > 0}"/>
+                </mx:VBox>
+            </mx:HBox>
+        </mx:FormItem>
+    </mx:Form>
+    <mx:ControlBar horizontalAlign="right">
+        <mx:Button label="Cancel" click="cancel()"/>
+        <mx:Button label="Save" click="save()"/>
+    </mx:ControlBar>
+</utils:ResizeableTitleWindow>

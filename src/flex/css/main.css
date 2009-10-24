@@ -1,0 +1,56 @@
+Docker {
+    paddingLeft: 0;
+    dockingAreaStyleName: "dockingArea";
+    rowStyleName: "dockingRow";
+}
+
+DockableToolBar {
+    addedEffect: "DockerFade";
+    borderStyle: "outset";
+    horizontalGap: 2;
+    paddingBottom: 2;
+    paddingLeft: 0;
+    paddingRight: 8;
+    paddingTop: 0;
+    backgroundColor: #DDDDDD;
+}
+
+TitleWindow {
+    borderAlpha: 1.0;
+}
+
+.dockingArea {
+    horizontalScrollPolicy: "off";
+    verticalGap: 0;
+    borderStyle: "applicationControlBar";
+    dropShadowEnabled: true;
+}
+
+.dockingRow {
+    horizontalGap: 1;
+    addedEffect: "DockerFade";
+    removedEffect: "DockerFade";
+}
+
+Alert {
+    color: #0f3177;
+    title-style-name: "alertTitle";
+    header-height: 19;
+    border-thickness: 1;
+    drop-shadow-enabled: true;
+    drop-shadow-color: #d1ddf7;
+    background-color: #ffffff;
+    corner-radius: 6;
+    border-style: solid;
+    header-colors: #90a4d1, #5970a0;
+    footer-colors: #9db6d9, #ffffff;
+    border-color: #5970a0;
+}
+
+.alertTitle {
+    font-family: Verdana;
+    font-size: 10;
+    font-weight: bold;
+    text-align: left;
+    color: #ffffff;
+}
